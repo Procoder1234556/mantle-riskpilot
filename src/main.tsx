@@ -39,6 +39,7 @@ type Route = "landing" | "app" | "presentation";
 type ReviewState = Record<string, "approved" | "rejected">;
 type ActionFilter = "ALL" | "HOLD" | "MONITOR" | "REBALANCE" | "REDUCE" | "INCREASE";
 type CategoryFilter = "all" | MantleOpportunity["category"];
+type StressMode = "base" | "volatile" | "defensive";
 
 const presentationSections = [
   "Executive Snapshot",
@@ -47,6 +48,15 @@ const presentationSections = [
   "Architecture",
   "Mantle Fit",
   "Roadmap",
+];
+
+const landingSignals = [
+  "Mantle TVL sync",
+  "mETH spread watch",
+  "DEX range stress",
+  "RWA drawdown guard",
+  "Evidence hash ready",
+  "Operator gate active",
 ];
 
 const formatUsd = (value: number) =>
@@ -188,6 +198,10 @@ function useLiveOpportunities() {
             volatilityBps: Math.max(90, item.volatilityBps + volatilityDelta),
             yieldBps: Math.max(120, item.yieldBps + yieldDelta),
             momentumScore: Math.min(95, Math.max(35, item.momentumScore + Math.round(wave * 2))),
+            gasCostUsd: Math.max(0.05, Number((item.gasCostUsd + (Math.random() - 0.5) * 0.04).toFixed(2))),
+            tvlChange24hPct: Math.max(-12, Math.min(12, item.tvlChange24hPct + wave * 0.28)),
+            drawdown30dPct: Math.max(0.4, Math.min(18, item.drawdown30dPct - wave * 0.18)),
+            sharpeEstimate: Math.max(0.25, Math.min(2.8, item.sharpeEstimate + wave * 0.02)),
             lastSignal:
               wave > 0.35
                 ? "Live feed shows improving depth and fee momentum"
@@ -324,9 +338,17 @@ function LandingPage() {
             <a href="#app">Open live MVP</a>
             <a href="#presentation">View judge deck</a>
           </div>
+          <div className="motion-ticker" aria-label="Live signal ticker">
+            <div>
+              {[...landingSignals, ...landingSignals].map((signal, index) => (
+                <span key={`${signal}-${index}`}>{signal}</span>
+              ))}
+            </div>
+          </div>
         </div>
 
         <section className="live-preview" aria-label="Live product preview">
+          <div className="preview-glow" />
           <div className="preview-top">
             <span>
               <Radio size={16} />
@@ -356,7 +378,30 @@ function LandingPage() {
             <li>Merchant Moe range cooled, moved to human review</li>
             <li>Registry payload created with evidence hash</li>
           </ol>
+          <div className="mini-market-grid">
+            <article>
+              <span>Gas</span>
+              <strong>$0.18</strong>
+            </article>
+            <article>
+              <span>Sharpe</span>
+              <strong>1.62</strong>
+            </article>
+            <article>
+              <span>30d DD</span>
+              <strong>4.8%</strong>
+            </article>
+          </div>
         </section>
+      </section>
+
+      <section className="motion-band" aria-label="Animated Mantle intelligence layer">
+        {landingSignals.slice(0, 4).map((signal, index) => (
+          <article style={{ animationDelay: `${index * 120}ms` }} key={signal}>
+            <CircleDot size={16} />
+            <span>{signal}</span>
+          </article>
+        ))}
       </section>
 
       <section className="landing-strip">
@@ -387,6 +432,8 @@ function Dashboard() {
   const [actionFilter, setActionFilter] = React.useState<ActionFilter>("ALL");
   const [categoryFilter, setCategoryFilter] = React.useState<CategoryFilter>("all");
   const [riskLimit, setRiskLimit] = React.useState(58);
+  const [stressMode, setStressMode] = React.useState<StressMode>("base");
+  const [showArchive, setShowArchive] = React.useState(false);
   const [selectedId, setSelectedId] = React.useState(mantleOpportunities[0].id);
   const [allocationUsd, setAllocationUsd] = React.useState(25_000);
   const { canInstall, install, installed } = useInstallPrompt();
@@ -395,12 +442,13 @@ function Dashboard() {
     () =>
       decisions.filter((decision) => {
         const source = opportunities.find((item) => item.id === decision.opportunityId);
+        const isRejected = reviews[decision.opportunityId] === "rejected";
         const actionMatch = actionFilter === "ALL" || decision.action === actionFilter;
         const categoryMatch = categoryFilter === "all" || source?.category === categoryFilter;
         const riskMatch = decision.riskScore <= riskLimit;
-        return actionMatch && categoryMatch && riskMatch;
+        return !isRejected && actionMatch && categoryMatch && riskMatch;
       }),
-    [actionFilter, categoryFilter, decisions, opportunities, riskLimit],
+    [actionFilter, categoryFilter, decisions, opportunities, reviews, riskLimit],
   );
   const agentRun = React.useMemo(() => runRiskPilotAgent(opportunities), [opportunities]);
   const summary = summarizePortfolio(decisions);
@@ -410,6 +458,14 @@ function Dashboard() {
   const artifact = buildRationaleArtifact(selectedDecision);
   const approvedCount = Object.values(reviews).filter((state) => state === "approved").length;
   const rejectedCount = Object.values(reviews).filter((state) => state === "rejected").length;
+  const activeCapital = decisions
+    .filter((decision) => reviews[decision.opportunityId] !== "rejected")
+    .reduce((total, decision) => {
+      const source = opportunities.find((item) => item.id === decision.opportunityId);
+      return total + (source?.liquidityUsd ?? 0);
+    }, 0);
+  const stressMultiplier = stressMode === "volatile" ? 1.35 : stressMode === "defensive" ? 0.72 : 1;
+  const stressedRisk = Math.min(99, Math.round(selectedDecision.riskScore * stressMultiplier));
   const projectedYieldUsd = Math.round((allocationUsd * selectedDecision.expectedYieldBps) / 10_000);
   const maxAutopilot = Math.max(0, Math.round(allocationUsd * (1 - selectedDecision.riskScore / 130)));
 
@@ -421,6 +477,10 @@ function Dashboard() {
       `${new Date().toLocaleTimeString()} - ${decision?.strategy ?? id} ${action}`,
       ...current,
     ].slice(0, 5));
+    if (state === "rejected") {
+      const nextVisible = filteredDecisions.find((item) => item.opportunityId !== id);
+      if (nextVisible) setSelectedId(nextVisible.opportunityId);
+    }
   };
 
   return (
@@ -539,7 +599,39 @@ function Dashboard() {
               onChange={(event) => setAllocationUsd(Number(event.target.value))}
             />
           </label>
+          <label>
+            <span>Stress test</span>
+            <select value={stressMode} onChange={(event) => setStressMode(event.target.value as StressMode)}>
+              <option value="base">Base market</option>
+              <option value="volatile">Volatile market</option>
+              <option value="defensive">Defensive market</option>
+            </select>
+          </label>
         </div>
+      </section>
+
+      <section className="insight-grid">
+        <article>
+          <span>Active liquidity</span>
+          <strong>{formatUsd(activeCapital)}</strong>
+          <p>Rejected opportunities are removed from this active opportunity set.</p>
+        </article>
+        <article>
+          <span>Stress risk</span>
+          <strong>{stressedRisk}/100</strong>
+          <p>Current selected strategy under the chosen policy stress mode.</p>
+        </article>
+        <article>
+          <span>Avg gas</span>
+          <strong>
+            $
+            {(
+              opportunities.reduce((total, item) => total + item.gasCostUsd, 0) /
+              opportunities.length
+            ).toFixed(2)}
+          </strong>
+          <p>Estimated Mantle execution cost across the active model.</p>
+        </article>
       </section>
 
       <section className="live-layout">
@@ -593,6 +685,14 @@ function Dashboard() {
                   <div>
                     <dt>Volatility</dt>
                     <dd>{source.volatilityBps} bps</dd>
+                  </div>
+                  <div>
+                    <dt>TVL 24h</dt>
+                    <dd>{source.tvlChange24hPct > 0 ? "+" : ""}{source.tvlChange24hPct.toFixed(1)}%</dd>
+                  </div>
+                  <div>
+                    <dt>Drawdown</dt>
+                    <dd>{source.drawdown30dPct.toFixed(1)}%</dd>
                   </div>
                 </dl>
                 <p className="signal">{decision.rationale[0]}</p>
@@ -666,6 +766,22 @@ function Dashboard() {
                 <dt>Autopilot Cap</dt>
                 <dd>{formatUsd(maxAutopilot)}</dd>
               </div>
+              <div>
+                <dt>Gas Estimate</dt>
+                <dd>${selectedSource.gasCostUsd.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt>Audit Status</dt>
+                <dd>{selectedSource.auditStatus}</dd>
+              </div>
+              <div>
+                <dt>Sharpe</dt>
+                <dd>{selectedSource.sharpeEstimate.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt>Stress Risk</dt>
+                <dd>{stressedRisk}/100</dd>
+              </div>
             </dl>
             <ul>
               {selectedDecision.rationale.slice(0, 4).map((item) => (
@@ -722,6 +838,33 @@ function Dashboard() {
                 {reviewFeed.map((item) => (
                   <span key={item}>{item}</span>
                 ))}
+              </div>
+            ) : null}
+            <button className="archive-toggle" type="button" onClick={() => setShowArchive(!showArchive)}>
+              {showArchive ? "Hide rejected archive" : `Show rejected archive (${rejectedCount})`}
+            </button>
+            {showArchive ? (
+              <div className="archive-list">
+                {decisions
+                  .filter((decision) => reviews[decision.opportunityId] === "rejected")
+                  .map((decision) => (
+                    <article key={decision.opportunityId}>
+                      <span>{decision.strategy}</span>
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setReviews((current) => {
+                            const next = { ...current };
+                            delete next[decision.opportunityId];
+                            return next;
+                          })
+                        }
+                      >
+                        Restore
+                      </button>
+                    </article>
+                  ))}
+                {rejectedCount === 0 ? <span>No rejected strategies yet.</span> : null}
               </div>
             ) : null}
           </section>

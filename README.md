@@ -28,8 +28,11 @@ Presentation page: https://mantle-riskpilot.vercel.app/#presentation
 - Uses a Vercel API route at `/api/live-data` so live data is fetched server-side
 - Recalculates strategy recommendations in a live operator dashboard
 - Lets an operator approve or reject agent decisions in the review queue
+- Hides rejected strategies from the active board and keeps them in a restoreable archive
+- Adds stress testing, gas estimates, TVL trend, drawdown, Sharpe estimate, and audit status
 - Routes users to the relevant Mantle/DeFi protocol market after a strategy is selected
 - Ships as an installable PWA with manifest, service worker, and app icons
+- Uses motion-enhanced landing sections to make the public demo feel alive for judges
 - Explains why an agent recommends hold, rebalance, reduce exposure, or monitor
 - Shows an auditable activity timeline for every agent decision
 - Includes a Solidity contract scaffold for storing AI strategy decisions on-chain

@@ -11,6 +11,11 @@ export type MantleOpportunity = {
   yieldBps: number;
   momentumScore: number;
   concentrationRisk: number;
+  gasCostUsd: number;
+  tvlChange24hPct: number;
+  drawdown30dPct: number;
+  sharpeEstimate: number;
+  auditStatus: "verified" | "monitored" | "experimental";
   lastSignal: string;
   evidence: string[];
   protocolUrl: string;
@@ -53,6 +58,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     yieldBps: 690,
     momentumScore: 78,
     concentrationRisk: 22,
+    gasCostUsd: 0.18,
+    tvlChange24hPct: 2.7,
+    drawdown30dPct: 4.8,
+    sharpeEstimate: 1.62,
+    auditStatus: "verified",
     lastSignal: "Yield spread widened while drawdown stayed controlled",
     evidence: [
       "mETH yield remains attractive relative to volatile LP positions",
@@ -73,6 +83,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     yieldBps: 830,
     momentumScore: 61,
     concentrationRisk: 38,
+    gasCostUsd: 0.24,
+    tvlChange24hPct: -1.1,
+    drawdown30dPct: 8.9,
+    sharpeEstimate: 1.08,
+    auditStatus: "monitored",
     lastSignal: "Fee velocity slowed while bin depth stayed healthy",
     evidence: [
       "Bin depth is sufficient but short-window fee velocity cooled",
@@ -93,6 +108,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     yieldBps: 510,
     momentumScore: 69,
     concentrationRisk: 17,
+    gasCostUsd: 0.16,
+    tvlChange24hPct: 0.8,
+    drawdown30dPct: 2.1,
+    sharpeEstimate: 1.84,
+    auditStatus: "verified",
     lastSignal: "Stable yield profile improves portfolio drawdown protection",
     evidence: [
       "RWA sleeve reduces portfolio variance",
@@ -113,6 +133,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     yieldBps: 240,
     momentumScore: 52,
     concentrationRisk: 25,
+    gasCostUsd: 0.13,
+    tvlChange24hPct: 0.2,
+    drawdown30dPct: 1.4,
+    sharpeEstimate: 0.91,
+    auditStatus: "experimental",
     lastSignal: "Low volatility route can absorb defensive stable allocations",
     evidence: [
       "Stable route volatility is lowest in the current opportunity set",
