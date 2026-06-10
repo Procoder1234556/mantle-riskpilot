@@ -13,6 +13,8 @@ export type MantleOpportunity = {
   concentrationRisk: number;
   lastSignal: string;
   evidence: string[];
+  protocolUrl: string;
+  tradeUrl: string;
 };
 
 export type AgentDecision = {
@@ -57,6 +59,8 @@ export const mantleOpportunities: MantleOpportunity[] = [
       "Liquidity is deep enough for staged allocation changes",
       "Correlation risk is lower than concentrated DEX range exposure",
     ],
+    protocolUrl: "https://meth.mantle.xyz/",
+    tradeUrl: "https://meth.mantle.xyz/",
   },
   {
     id: "moe-range-watch",
@@ -75,6 +79,8 @@ export const mantleOpportunities: MantleOpportunity[] = [
       "Volatility suggests no immediate autonomous rebalance",
       "Operator review protects against range-chasing behavior",
     ],
+    protocolUrl: "https://merchantmoe.com/",
+    tradeUrl: "https://merchantmoe.com/trade",
   },
   {
     id: "usdy-defensive-sleeve",
@@ -93,6 +99,8 @@ export const mantleOpportunities: MantleOpportunity[] = [
       "Lower volatility supports defensive allocation",
       "Yield is lower than LP routes but risk-adjusted score is strong",
     ],
+    protocolUrl: "https://ondo.finance/",
+    tradeUrl: "https://ondo.finance/usdy",
   },
   {
     id: "stable-route-sentinel",
@@ -111,6 +119,8 @@ export const mantleOpportunities: MantleOpportunity[] = [
       "Yield is modest, so the agent avoids over-allocating",
       "Useful as a safe harbor during higher DEX volatility",
     ],
+    protocolUrl: "https://agni.finance/",
+    tradeUrl: "https://agni.finance/swap",
   },
 ];
 

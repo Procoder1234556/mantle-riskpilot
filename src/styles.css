@@ -134,6 +134,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.72;
+}
+
 .live-toggle {
   display: inline-flex;
   gap: 8px;
@@ -141,6 +146,29 @@ button {
   padding: 0 16px;
   font-weight: 800;
   white-space: nowrap;
+}
+
+.install-compact,
+.install-link {
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+  border-radius: 8px;
+  font-weight: 800;
+}
+
+.install-compact {
+  color: #ffffff;
+  background: #16413d;
+}
+
+.install-link {
+  border: 1px solid #c9dad5;
+  color: #13201f;
+  background: #ffffff;
 }
 
 .icon-button {
@@ -408,9 +436,34 @@ dd {
   font-weight: 800;
 }
 
+.review-actions a,
+.market-actions a {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 0 13px;
+  border-radius: 8px;
+  color: #0c2726;
+  background: #eef8f3;
+  font-weight: 800;
+  text-decoration: none;
+}
+
 .review-actions button + button {
   color: #651b1b;
   background: #ffe2e0;
+}
+
+.review-actions .action-done {
+  color: #ffffff;
+  background: #24906f;
+}
+
+.review-actions button + button.action-done {
+  color: #ffffff;
+  background: #8b2e2e;
 }
 
 .registry {
@@ -442,6 +495,32 @@ dd {
   padding-left: 19px;
   color: #3f5551;
   line-height: 1.45;
+}
+
+.market-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.market-actions a:last-child {
+  color: #ffffff;
+  background: #0c2726;
+}
+
+.review-log {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #d5e2dd;
+}
+
+.review-log span {
+  color: #3f5551;
+  font-size: 14px;
+  line-height: 1.4;
 }
 
 .selected-meter {
@@ -1066,13 +1145,21 @@ pre {
   }
 
   .review-actions button,
+  .review-actions a,
+  .market-actions,
   .live-toggle,
+  .install-compact,
+  .install-link,
   .hero-actions a,
   .primary-link {
     min-width: 0;
     width: 100%;
     justify-content: center;
     white-space: normal;
+  }
+
+  .market-actions {
+    grid-template-columns: 1fr;
   }
 
   dl {

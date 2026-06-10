@@ -10,6 +10,8 @@ import {
   CircleDot,
   ClipboardList,
   Clock3,
+  Download,
+  ExternalLink,
   FileText,
   Gauge,
   Landmark,
@@ -60,6 +62,51 @@ const routeFromHash = (): Route => {
   if (window.location.hash === "#presentation") return "presentation";
   return "landing";
 };
+
+function useServiceWorker() {
+  React.useEffect(() => {
+    if ("serviceWorker" in navigator) {
+      navigator.serviceWorker.register("/service-worker.js").catch(() => undefined);
+    }
+  }, []);
+}
+
+function useInstallPrompt() {
+  const [installEvent, setInstallEvent] = React.useState<BeforeInstallPromptEvent | null>(null);
+  const [installed, setInstalled] = React.useState(
+    () => window.matchMedia?.("(display-mode: standalone)").matches ?? false,
+  );
+
+  React.useEffect(() => {
+    const onBeforeInstallPrompt = (event: Event) => {
+      event.preventDefault();
+      setInstallEvent(event as BeforeInstallPromptEvent);
+    };
+    const onInstalled = () => {
+      setInstalled(true);
+      setInstallEvent(null);
+    };
+
+    window.addEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+    window.addEventListener("appinstalled", onInstalled);
+    return () => {
+      window.removeEventListener("beforeinstallprompt", onBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", onInstalled);
+    };
+  }, []);
+
+  const install = async () => {
+    if (!installEvent) return;
+    await installEvent.prompt();
+    const choice = await installEvent.userChoice;
+    if (choice.outcome === "accepted") {
+      setInstalled(true);
+    }
+    setInstallEvent(null);
+  };
+
+  return { canInstall: Boolean(installEvent), install, installed };
+}
 
 function useRoute() {
   const [route, setRoute] = React.useState<Route>(routeFromHash);
@@ -175,6 +222,7 @@ function useLiveOpportunities() {
 }
 
 function App() {
+  useServiceWorker();
   const route = useRoute();
 
   if (route === "app") {
@@ -238,6 +286,8 @@ function Shell({
 }
 
 function LandingPage() {
+  const { canInstall, install, installed } = useInstallPrompt();
+
   return (
     <main className="landing">
       <header className="landing-nav">
@@ -250,6 +300,10 @@ function LandingPage() {
         </a>
         <div>
           <a href="#presentation">Pitch</a>
+          <button className="install-link" type="button" onClick={install} disabled={!canInstall && !installed}>
+            <Download size={16} />
+            {installed ? "Installed" : "Install app"}
+          </button>
           <a className="primary-link" href="#app">
             Launch MVP
             <ArrowRight size={17} />
@@ -329,11 +383,13 @@ function LandingPage() {
 function Dashboard() {
   const { feed, live, opportunities, setLive, snapshot, tick } = useLiveOpportunities();
   const [reviews, setReviews] = React.useState<ReviewState>({});
+  const [reviewFeed, setReviewFeed] = React.useState<string[]>([]);
   const [actionFilter, setActionFilter] = React.useState<ActionFilter>("ALL");
   const [categoryFilter, setCategoryFilter] = React.useState<CategoryFilter>("all");
   const [riskLimit, setRiskLimit] = React.useState(58);
   const [selectedId, setSelectedId] = React.useState(mantleOpportunities[0].id);
   const [allocationUsd, setAllocationUsd] = React.useState(25_000);
+  const { canInstall, install, installed } = useInstallPrompt();
   const decisions = React.useMemo(() => buildDecisionSet(opportunities), [opportunities]);
   const filteredDecisions = React.useMemo(
     () =>
@@ -359,6 +415,12 @@ function Dashboard() {
 
   const reviewDecision = (id: string, state: "approved" | "rejected") => {
     setReviews((current) => ({ ...current, [id]: state }));
+    const decision = decisions.find((item) => item.opportunityId === id);
+    const action = state === "approved" ? "approved for execution review" : "rejected by operator";
+    setReviewFeed((current) => [
+      `${new Date().toLocaleTimeString()} - ${decision?.strategy ?? id} ${action}`,
+      ...current,
+    ].slice(0, 5));
   };
 
   return (
@@ -375,6 +437,10 @@ function Dashboard() {
         <button className="live-toggle" type="button" onClick={() => setLive(!live)}>
           {live ? <Pause size={17} /> : <Play size={17} />}
           {live ? "Pause stream" : "Resume stream"}
+        </button>
+        <button className="install-compact" type="button" onClick={install} disabled={!canInstall && !installed}>
+          <Download size={17} />
+          {installed ? "Installed" : "Install"}
         </button>
       </header>
 
@@ -532,6 +598,8 @@ function Dashboard() {
                 <p className="signal">{decision.rationale[0]}</p>
                 <div className="review-actions">
                   <button
+                    className={reviewState === "approved" ? "action-done" : ""}
+                    disabled={reviewState === "approved"}
                     type="button"
                     onClick={(event) => {
                       event.stopPropagation();
@@ -539,9 +607,11 @@ function Dashboard() {
                     }}
                   >
                     <Check size={16} />
-                    Approve
+                    {reviewState === "approved" ? "Approved" : "Approve"}
                   </button>
                   <button
+                    className={reviewState === "rejected" ? "action-done" : ""}
+                    disabled={reviewState === "rejected"}
                     type="button"
                     onClick={(event) => {
                       event.stopPropagation();
@@ -549,8 +619,12 @@ function Dashboard() {
                     }}
                   >
                     <X size={16} />
-                    Reject
+                    {reviewState === "rejected" ? "Rejected" : "Reject"}
                   </button>
+                  <a href={source.tradeUrl} target="_blank" rel="noreferrer">
+                    <ExternalLink size={16} />
+                    Open market
+                  </a>
                 </div>
               </article>
             );
@@ -598,6 +672,16 @@ function Dashboard() {
                 <li key={item}>{item}</li>
               ))}
             </ul>
+            <div className="market-actions">
+              <a href={selectedSource.protocolUrl} target="_blank" rel="noreferrer">
+                <ExternalLink size={16} />
+                Protocol site
+              </a>
+              <a href={selectedSource.tradeUrl} target="_blank" rel="noreferrer">
+                <WalletCards size={16} />
+                Buy or allocate
+              </a>
+            </div>
           </section>
 
           <section className="registry">
@@ -632,6 +716,14 @@ function Dashboard() {
                 </article>
               ))}
             </div>
+            {reviewFeed.length > 0 ? (
+              <div className="review-log">
+                <p className="eyebrow">Latest operator actions</p>
+                {reviewFeed.map((item) => (
+                  <span key={item}>{item}</span>
+                ))}
+              </div>
+            ) : null}
           </section>
 
           <section className="registry live-feed">
