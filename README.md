@@ -40,6 +40,23 @@ RiskPilot focuses on a real missing layer in agentic DeFi: accountability before
 
 ## Local Development
 
+Create a local copy without manually cloning:
+
+```bash
+npx github:Procoder1234556/mantle-riskpilot my-riskpilot
+cd my-riskpilot
+npm install
+npm run dev
+```
+
+After publishing to npm, the shorter command will be:
+
+```bash
+npx create-mantle-riskpilot my-riskpilot
+```
+
+Manual setup:
+
 ```bash
 npm install
 npm run dev

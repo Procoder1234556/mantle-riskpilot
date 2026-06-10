@@ -1,8 +1,27 @@
 {
   "name": "mantle-riskpilot",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
   "type": "module",
+  "bin": {
+    "mantle-riskpilot": "./bin/create-mantle-riskpilot.js",
+    "create-mantle-riskpilot": "./bin/create-mantle-riskpilot.js"
+  },
+  "files": [
+    "api",
+    "bin",
+    "contracts",
+    "src",
+    "index.html",
+    "package.json",
+    "package-lock.json",
+    "README.md",
+    "PITCH.md",
+    "SUBMISSION.md",
+    "tsconfig.json",
+    "vercel.json",
+    "vite.config.ts"
+  ],
   "scripts": {
     "dev": "vite --host 0.0.0.0",
     "build": "tsc && vite build",
