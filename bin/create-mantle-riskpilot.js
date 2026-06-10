@@ -44,10 +44,6 @@ if (existsSync(targetDir) && readdirSync(targetDir).length > 0) {
 }
 
 async function downloadSource() {
-  if (existsSync(join(packageRoot, "src", "main.tsx")) && existsSync(join(packageRoot, "api", "live-data.js"))) {
-    return packageRoot;
-  }
-
   const tempRoot = join(tmpdir(), `mantle-riskpilot-${Date.now()}`);
   mkdirSync(tempRoot, { recursive: true });
 
