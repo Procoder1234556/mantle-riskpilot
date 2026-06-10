@@ -40,6 +40,12 @@ async function fetchJson<T>(url: string): Promise<T> {
 }
 
 export async function fetchLiveSnapshot(): Promise<LiveSnapshot> {
+  try {
+    return await fetchJson<LiveSnapshot>("/api/live-data");
+  } catch {
+    // Local dev fallback when the Vercel function is not running.
+  }
+
   const [chains, yields] = await Promise.all([
     fetchJson<ChainRecord[]>("https://api.llama.fi/v2/chains"),
     fetchJson<YieldResponse>("https://yields.llama.fi/pools"),

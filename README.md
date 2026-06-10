@@ -25,6 +25,7 @@ Presentation page: https://mantle-riskpilot.vercel.app/#presentation
 
 - Scores Mantle DeFi opportunities across liquidity, volatility, risk, and momentum
 - Pulls public Mantle context from DefiLlama and falls back to a resilient local stream
+- Uses a Vercel API route at `/api/live-data` so live data is fetched server-side
 - Recalculates strategy recommendations in a live operator dashboard
 - Lets an operator approve or reject agent decisions in the review queue
 - Explains why an agent recommends hold, rebalance, reduce exposure, or monitor
@@ -61,6 +62,7 @@ decision payload -> StrategyDecisionRegistry.sol -> Mantle transaction log
 
 - `src/agentWorkflow.ts` - builds the agent run, stages, and audit summary
 - `src/liveData.ts` - fetches public live DeFi data and maps it into the opportunity model
+- `api/live-data.js` - Vercel serverless proxy for DefiLlama chain/yield data
 - `src/riskEngine.ts` - scores Mantle opportunities and emits typed decisions
 - `src/mantleProtocols.ts` - maps Mantle protocol roles and risk surfaces
 - `contracts/StrategyDecisionRegistry.sol` - on-chain decision registry

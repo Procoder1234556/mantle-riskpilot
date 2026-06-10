@@ -12,6 +12,7 @@
 
 body {
   margin: 0;
+  overflow-x: hidden;
 }
 
 html {
@@ -93,6 +94,7 @@ nav a:hover {
 }
 
 .workspace {
+  min-width: 0;
   padding: 32px;
 }
 
@@ -109,6 +111,7 @@ nav a:hover {
   margin: 4px 0 0;
   font-size: clamp(32px, 5vw, 64px);
   line-height: 1;
+  overflow-wrap: anywhere;
 }
 
 .topbar-copy {
@@ -215,6 +218,58 @@ button {
   white-space: nowrap;
 }
 
+.control-surface {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 18px;
+  border: 1px solid #d5e2dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.controls-grid {
+  display: grid;
+  grid-template-columns: 0.9fr 0.9fr 1.2fr 0.8fr;
+  gap: 12px;
+}
+
+.controls-grid label {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.controls-grid label span {
+  color: #5f7671;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+select,
+input {
+  min-width: 0;
+  min-height: 42px;
+  border: 1px solid #cbdcd6;
+  border-radius: 8px;
+  color: #13201f;
+  background: #f7faf8;
+  font-weight: 700;
+}
+
+select {
+  padding: 0 12px;
+}
+
+input[type="number"] {
+  padding: 0 12px;
+}
+
+input[type="range"] {
+  accent-color: #24906f;
+}
+
 .panel-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
@@ -319,6 +374,7 @@ dd {
 }
 
 .dynamic-card {
+  cursor: pointer;
   transition:
     border-color 180ms ease,
     box-shadow 180ms ease,
@@ -329,6 +385,11 @@ dd {
   border-color: #91d7c7;
   box-shadow: 0 16px 40px rgba(15, 44, 41, 0.09);
   transform: translateY(-2px);
+}
+
+.selected-card {
+  border-color: #35b994;
+  box-shadow: 0 0 0 3px rgba(53, 185, 148, 0.14);
 }
 
 .review-actions {
@@ -366,6 +427,50 @@ dd {
   display: grid;
   align-content: start;
   gap: 16px;
+}
+
+.detail-panel dl {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.detail-panel ul {
+  display: grid;
+  gap: 9px;
+  margin: 16px 0 0;
+  padding-left: 19px;
+  color: #3f5551;
+  line-height: 1.45;
+}
+
+.selected-meter {
+  height: 12px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  border-radius: 999px;
+  background: #e6efeb;
+}
+
+.selected-meter span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #35b994, #102826);
+}
+
+.empty-state {
+  display: grid;
+  gap: 8px;
+  padding: 22px;
+  border: 1px dashed #b6cbc5;
+  border-radius: 8px;
+  color: #465d58;
+  background: #ffffff;
+}
+
+.empty-state span {
+  color: #5f7671;
 }
 
 .queue-stats {
@@ -879,6 +984,7 @@ pre {
   .live-layout,
   .metrics,
   .source-strip,
+  .controls-grid,
   .protocol-grid,
   .landing-hero,
   .landing-strip,
@@ -893,6 +999,7 @@ pre {
   .sidebar {
     position: static;
     height: auto;
+    width: 100%;
   }
 
   .toc {
@@ -912,7 +1019,64 @@ pre {
     flex-direction: column;
   }
 
+  .topbar > div,
+  .app-topbar,
+  .workspace,
+  .strategy-card,
+  .registry,
+  .control-surface {
+    min-width: 0;
+    max-width: 100%;
+  }
+
   .landing-hero {
     min-height: auto;
+  }
+}
+
+@media (max-width: 620px) {
+  .workspace {
+    padding: 18px;
+  }
+
+  .topbar h1,
+  .hero-copy h1,
+  .presentation-hero h1 {
+    font-size: 30px;
+    line-height: 1;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+  }
+
+  .app-topbar h1 {
+    max-width: 330px;
+  }
+
+  .topbar-copy,
+  .hero-copy p:not(.eyebrow),
+  .presentation-hero p {
+    font-size: 16px;
+  }
+
+  .strategy-card,
+  .detail-panel dl,
+  .queue-stats,
+  .preview-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .review-actions button,
+  .live-toggle,
+  .hero-actions a,
+  .primary-link {
+    min-width: 0;
+    width: 100%;
+    justify-content: center;
+    white-space: normal;
+  }
+
+  dl {
+    flex-wrap: wrap;
+    gap: 14px;
   }
 }

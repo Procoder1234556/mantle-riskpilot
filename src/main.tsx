@@ -20,6 +20,7 @@ import {
   Play,
   Radio,
   ShieldCheck,
+  SlidersHorizontal,
   Sparkles,
   WalletCards,
   X,
@@ -34,6 +35,8 @@ import "./styles.css";
 
 type Route = "landing" | "app" | "presentation";
 type ReviewState = Record<string, "approved" | "rejected">;
+type ActionFilter = "ALL" | "HOLD" | "MONITOR" | "REBALANCE" | "REDUCE" | "INCREASE";
+type CategoryFilter = "all" | MantleOpportunity["category"];
 
 const presentationSections = [
   "Executive Snapshot",
@@ -326,13 +329,33 @@ function LandingPage() {
 function Dashboard() {
   const { feed, live, opportunities, setLive, snapshot, tick } = useLiveOpportunities();
   const [reviews, setReviews] = React.useState<ReviewState>({});
+  const [actionFilter, setActionFilter] = React.useState<ActionFilter>("ALL");
+  const [categoryFilter, setCategoryFilter] = React.useState<CategoryFilter>("all");
+  const [riskLimit, setRiskLimit] = React.useState(58);
+  const [selectedId, setSelectedId] = React.useState(mantleOpportunities[0].id);
+  const [allocationUsd, setAllocationUsd] = React.useState(25_000);
   const decisions = React.useMemo(() => buildDecisionSet(opportunities), [opportunities]);
+  const filteredDecisions = React.useMemo(
+    () =>
+      decisions.filter((decision) => {
+        const source = opportunities.find((item) => item.id === decision.opportunityId);
+        const actionMatch = actionFilter === "ALL" || decision.action === actionFilter;
+        const categoryMatch = categoryFilter === "all" || source?.category === categoryFilter;
+        const riskMatch = decision.riskScore <= riskLimit;
+        return actionMatch && categoryMatch && riskMatch;
+      }),
+    [actionFilter, categoryFilter, decisions, opportunities, riskLimit],
+  );
   const agentRun = React.useMemo(() => runRiskPilotAgent(opportunities), [opportunities]);
   const summary = summarizePortfolio(decisions);
-  const topDecision = decisions[0];
-  const artifact = buildRationaleArtifact(topDecision);
+  const selectedDecision =
+    decisions.find((decision) => decision.opportunityId === selectedId) ?? decisions[0];
+  const selectedSource = opportunities.find((item) => item.id === selectedDecision.opportunityId)!;
+  const artifact = buildRationaleArtifact(selectedDecision);
   const approvedCount = Object.values(reviews).filter((state) => state === "approved").length;
   const rejectedCount = Object.values(reviews).filter((state) => state === "rejected").length;
+  const projectedYieldUsd = Math.round((allocationUsd * selectedDecision.expectedYieldBps) / 10_000);
+  const maxAutopilot = Math.max(0, Math.round(allocationUsd * (1 - selectedDecision.riskScore / 130)));
 
   const reviewDecision = (id: string, state: "approved" | "rejected") => {
     setReviews((current) => ({ ...current, [id]: state }));
@@ -397,6 +420,62 @@ function Dashboard() {
         </article>
       </section>
 
+      <section className="control-surface">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Interactive policy controls</p>
+            <h2>Shape the agent run</h2>
+          </div>
+          <SlidersHorizontal size={22} />
+        </div>
+        <div className="controls-grid">
+          <label>
+            <span>Action filter</span>
+            <select value={actionFilter} onChange={(event) => setActionFilter(event.target.value as ActionFilter)}>
+              <option value="ALL">All actions</option>
+              <option value="REBALANCE">Rebalance</option>
+              <option value="INCREASE">Increase</option>
+              <option value="MONITOR">Monitor</option>
+              <option value="REDUCE">Reduce</option>
+              <option value="HOLD">Hold</option>
+            </select>
+          </label>
+          <label>
+            <span>Category</span>
+            <select
+              value={categoryFilter}
+              onChange={(event) => setCategoryFilter(event.target.value as CategoryFilter)}
+            >
+              <option value="all">All categories</option>
+              <option value="liquid-staking">Liquid staking</option>
+              <option value="dex-liquidity">DEX liquidity</option>
+              <option value="rwa-yield">RWA yield</option>
+              <option value="stable-routing">Stable routing</option>
+            </select>
+          </label>
+          <label>
+            <span>Max auto-risk: {riskLimit}/100</span>
+            <input
+              max="95"
+              min="15"
+              type="range"
+              value={riskLimit}
+              onChange={(event) => setRiskLimit(Number(event.target.value))}
+            />
+          </label>
+          <label>
+            <span>Test allocation</span>
+            <input
+              min="1000"
+              step="1000"
+              type="number"
+              value={allocationUsd}
+              onChange={(event) => setAllocationUsd(Number(event.target.value))}
+            />
+          </label>
+        </div>
+      </section>
+
       <section className="live-layout">
         <section className="strategy-list" id="strategies">
           <div className="section-heading">
@@ -404,15 +483,22 @@ function Dashboard() {
               <p className="eyebrow">Realtime agent recommendations</p>
               <h2>Strategy board</h2>
             </div>
-            <span className={live ? "status-dot online" : "status-dot"}>{live ? "Live" : "Paused"}</span>
+            <span className={live ? "status-dot online" : "status-dot"}>
+              {filteredDecisions.length} visible
+            </span>
           </div>
 
-          {decisions.map((decision) => {
+          {filteredDecisions.map((decision) => {
             const source = opportunities.find((item) => item.id === decision.opportunityId)!;
             const reviewState = reviews[decision.opportunityId];
+            const selected = decision.opportunityId === selectedDecision.opportunityId;
 
             return (
-              <article className="strategy-card dynamic-card" key={decision.opportunityId}>
+              <article
+                className={`strategy-card dynamic-card ${selected ? "selected-card" : ""}`}
+                key={decision.opportunityId}
+                onClick={() => setSelectedId(decision.opportunityId)}
+              >
                 <div>
                   <h3>{decision.strategy}</h3>
                   <p>
@@ -445,11 +531,23 @@ function Dashboard() {
                 </dl>
                 <p className="signal">{decision.rationale[0]}</p>
                 <div className="review-actions">
-                  <button type="button" onClick={() => reviewDecision(decision.opportunityId, "approved")}>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      reviewDecision(decision.opportunityId, "approved");
+                    }}
+                  >
                     <Check size={16} />
                     Approve
                   </button>
-                  <button type="button" onClick={() => reviewDecision(decision.opportunityId, "rejected")}>
+                  <button
+                    type="button"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      reviewDecision(decision.opportunityId, "rejected");
+                    }}
+                  >
                     <X size={16} />
                     Reject
                   </button>
@@ -457,9 +555,51 @@ function Dashboard() {
               </article>
             );
           })}
+
+          {filteredDecisions.length === 0 ? (
+            <article className="empty-state">
+              <strong>No strategies match this policy.</strong>
+              <span>Raise the risk threshold or change filters to widen the agent queue.</span>
+            </article>
+          ) : null}
         </section>
 
         <aside className="operator-panel">
+          <section className="registry detail-panel">
+            <div className="section-heading">
+              <div>
+                <p className="eyebrow">Selected strategy</p>
+                <h2>{selectedDecision.strategy}</h2>
+              </div>
+            </div>
+            <div className="selected-meter">
+              <span style={{ width: `${selectedDecision.confidence}%` }} />
+            </div>
+            <dl>
+              <div>
+                <dt>Protocol</dt>
+                <dd>{selectedDecision.protocol}</dd>
+              </div>
+              <div>
+                <dt>Asset</dt>
+                <dd>{selectedSource.asset}</dd>
+              </div>
+              <div>
+                <dt>Projected Yield</dt>
+                <dd>{formatUsd(projectedYieldUsd)}</dd>
+              </div>
+              <div>
+                <dt>Autopilot Cap</dt>
+                <dd>{formatUsd(maxAutopilot)}</dd>
+              </div>
+            </dl>
+            <ul>
+              {selectedDecision.rationale.slice(0, 4).map((item) => (
+                <li key={item}>{item}</li>
+              ))}
+            </ul>
+          </section>
+
           <section className="registry">
             <div className="section-heading">
               <div>
