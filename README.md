@@ -30,6 +30,7 @@ Presentation page: https://mantle-riskpilot.vercel.app/#presentation
 - Lets an operator approve or reject agent decisions in the review queue
 - Hides rejected strategies from the active board and keeps them in a restoreable archive
 - Adds stress testing, gas estimates, TVL trend, drawdown, Sharpe estimate, and audit status
+- Adds Solana-winner-inspired agent runbooks, health-factor monitoring, wallet-cluster signals, social consensus, and payoff simulation
 - Routes users to the relevant Mantle/DeFi protocol market after a strategy is selected
 - Ships as an installable PWA with manifest, service worker, and app icons
 - Uses motion-enhanced landing sections to make the public demo feel alive for judges
@@ -107,6 +108,12 @@ This project was informed by open-source Web3 AI agent patterns from:
 - `edkdev/defi-trading-mcp` for discovery, risk, quote, and execution tool boundaries
 - `0xgasless/agentkit` for schema-like on-chain action abstractions
 - `chainstacklabs/web3-ai-trading-agent` for the broader autonomous trading-agent pipeline
+
+It also borrows product patterns from Solana ecosystem hackathon winners and finalists:
+
+- Solana Radar winners highlighted runbook infrastructure, real-time monitoring, smart wallet infrastructure, DeFi routing, and volatility/yield products.
+- Solana Renaissance winners emphasized asset management, consumer-grade payment UX, and DeFi yield derivatives.
+- Solana Agent Hackathon projects emphasized autonomous position monitoring, health-factor classification, and human-readable agent actions.
 
 The code in this repository is a fresh Mantle-focused implementation for the hackathon submission.
 

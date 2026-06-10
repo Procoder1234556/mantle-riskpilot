@@ -332,6 +332,118 @@ input[type="range"] {
   line-height: 1.45;
 }
 
+.winner-console,
+.winner-playbook {
+  display: grid;
+  gap: 16px;
+  margin-bottom: 24px;
+  padding: 20px;
+  border: 1px solid #d5e2dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.winner-playbook {
+  max-width: 1180px;
+  margin: 0 auto 52px;
+}
+
+.winner-playbook h2,
+.winner-console h2 {
+  max-width: 760px;
+}
+
+.playbook-grid,
+.console-grid,
+.payoff-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.playbook-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.console-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.payoff-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.playbook-grid article,
+.console-grid article,
+.payoff-grid article {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 16px;
+  border: 1px solid #d5e2dd;
+  border-radius: 8px;
+  background: #f7faf8;
+}
+
+.playbook-grid span,
+.console-grid span,
+.payoff-grid span {
+  color: #5f7671;
+  font-size: 12px;
+  font-weight: 800;
+  text-transform: uppercase;
+}
+
+.playbook-grid strong,
+.console-grid strong,
+.payoff-grid strong {
+  overflow-wrap: anywhere;
+  font-size: 22px;
+}
+
+.console-grid p,
+.playbook-grid p {
+  margin: 0;
+  color: #5f7671;
+  line-height: 1.45;
+}
+
+.runbook-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #d5e2dd;
+}
+
+.runbook-panel article {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 10px;
+  align-items: start;
+  padding: 10px;
+  border: 1px solid #d5e2dd;
+  border-radius: 8px;
+  background: #f7faf8;
+}
+
+.runbook-panel article span {
+  display: grid;
+  width: 26px;
+  height: 26px;
+  place-items: center;
+  border-radius: 999px;
+  color: #ffffff;
+  background: #16413d;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.runbook-panel p {
+  margin: 0;
+  color: #3f5551;
+  line-height: 1.4;
+}
+
 .panel-grid {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) minmax(320px, 0.8fr);
@@ -1259,6 +1371,9 @@ pre {
   .source-strip,
   .controls-grid,
   .insight-grid,
+  .playbook-grid,
+  .console-grid,
+  .payoff-grid,
   .protocol-grid,
   .landing-hero,
   .landing-strip,

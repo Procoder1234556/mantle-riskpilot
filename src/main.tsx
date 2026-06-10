@@ -59,6 +59,29 @@ const landingSignals = [
   "Operator gate active",
 ];
 
+const winnerPlaybook = [
+  {
+    title: "Runbook automation",
+    source: "Txtx-style infra clarity",
+    detail: "Every strategy now exposes the exact checks the agent performs before a human approves capital movement.",
+  },
+  {
+    title: "Health-factor guardian",
+    source: "DeFi Risk Guardian pattern",
+    detail: "Each route tracks health factor, liquidation buffer, and stress-risk so unsafe positions are visible immediately.",
+  },
+  {
+    title: "Wallet-cluster alpha",
+    source: "Solana agent/copy-trading pattern",
+    detail: "The score blends market data with wallet-cluster and social-consensus signals to avoid blind yield chasing.",
+  },
+  {
+    title: "Operator-to-execution path",
+    source: "Winning DeFi UX pattern",
+    detail: "Approved ideas lead to live protocol routes, registry payloads, and a transparent review trail.",
+  },
+];
+
 const formatUsd = (value: number) =>
   new Intl.NumberFormat("en-US", {
     maximumFractionDigits: 1,
@@ -202,6 +225,10 @@ function useLiveOpportunities() {
             tvlChange24hPct: Math.max(-12, Math.min(12, item.tvlChange24hPct + wave * 0.28)),
             drawdown30dPct: Math.max(0.4, Math.min(18, item.drawdown30dPct - wave * 0.18)),
             sharpeEstimate: Math.max(0.25, Math.min(2.8, item.sharpeEstimate + wave * 0.02)),
+            healthFactor: Math.max(1.05, Math.min(3.8, Number((item.healthFactor + wave * 0.015).toFixed(2)))),
+            liquidationBufferPct: Math.max(5, Math.min(60, item.liquidationBufferPct + Math.round(wave))),
+            walletClusterSignal: Math.max(15, Math.min(98, item.walletClusterSignal + Math.round(wave * 1.6))),
+            socialConsensus: Math.max(10, Math.min(96, item.socialConsensus + Math.round(wave * 1.2))),
             lastSignal:
               wave > 0.35
                 ? "Live feed shows improving depth and fee momentum"
@@ -421,6 +448,24 @@ function LandingPage() {
           <span>Each decision maps to a Solidity registry payload.</span>
         </article>
       </section>
+
+      <section className="winner-playbook" aria-label="Solana winner inspired feature playbook">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Borrowed from winning ecosystems</p>
+            <h2>Solana winner patterns, rebuilt for Mantle.</h2>
+          </div>
+        </div>
+        <div className="playbook-grid">
+          {winnerPlaybook.map((item) => (
+            <article key={item.title}>
+              <span>{item.source}</span>
+              <strong>{item.title}</strong>
+              <p>{item.detail}</p>
+            </article>
+          ))}
+        </div>
+      </section>
     </main>
   );
 }
@@ -468,6 +513,17 @@ function Dashboard() {
   const stressedRisk = Math.min(99, Math.round(selectedDecision.riskScore * stressMultiplier));
   const projectedYieldUsd = Math.round((allocationUsd * selectedDecision.expectedYieldBps) / 10_000);
   const maxAutopilot = Math.max(0, Math.round(allocationUsd * (1 - selectedDecision.riskScore / 130)));
+  const downsideUsd = Math.round((allocationUsd * selectedSource.drawdown30dPct * stressMultiplier) / 100);
+  const probabilityAdjustedYield = Math.round(projectedYieldUsd * (selectedDecision.confidence / 100));
+  const runbookCompletion = Math.min(
+    100,
+    Math.round(
+      (selectedSource.healthFactor / 3.5) * 32 +
+        selectedSource.walletClusterSignal * 0.28 +
+        selectedSource.socialConsensus * 0.2 +
+        selectedDecision.confidence * 0.2,
+    ),
+  );
 
   const reviewDecision = (id: string, state: "approved" | "rejected") => {
     setReviews((current) => ({ ...current, [id]: state }));
@@ -634,6 +690,51 @@ function Dashboard() {
         </article>
       </section>
 
+      <section className="winner-console">
+        <div className="section-heading">
+          <div>
+            <p className="eyebrow">Solana winner-inspired console</p>
+            <h2>Agent health, payoff, and crowd-risk checks</h2>
+          </div>
+        </div>
+        <div className="console-grid">
+          <article>
+            <span>Health factor</span>
+            <strong>{selectedSource.healthFactor.toFixed(2)}</strong>
+            <p>{selectedSource.liquidationBufferPct}% liquidation buffer on the selected route.</p>
+          </article>
+          <article>
+            <span>Wallet cluster</span>
+            <strong>{selectedSource.walletClusterSignal}/100</strong>
+            <p>Smart-wallet and route-consensus proxy for copy-trade quality.</p>
+          </article>
+          <article>
+            <span>Social consensus</span>
+            <strong>{selectedSource.socialConsensus}/100</strong>
+            <p>Community signal check before the agent trusts short-term alpha.</p>
+          </article>
+          <article>
+            <span>Autonomy mode</span>
+            <strong>{selectedSource.autonomyLevel}</strong>
+            <p>Execution stays gated until registry evidence and operator review pass.</p>
+          </article>
+        </div>
+        <div className="payoff-grid">
+          <article>
+            <span>Probability-adjusted yield</span>
+            <strong>{formatUsd(probabilityAdjustedYield)}</strong>
+          </article>
+          <article>
+            <span>Stress downside</span>
+            <strong>{formatUsd(downsideUsd)}</strong>
+          </article>
+          <article>
+            <span>Runbook readiness</span>
+            <strong>{runbookCompletion}%</strong>
+          </article>
+        </div>
+      </section>
+
       <section className="live-layout">
         <section className="strategy-list" id="strategies">
           <div className="section-heading">
@@ -693,6 +794,14 @@ function Dashboard() {
                   <div>
                     <dt>Drawdown</dt>
                     <dd>{source.drawdown30dPct.toFixed(1)}%</dd>
+                  </div>
+                  <div>
+                    <dt>Health</dt>
+                    <dd>{source.healthFactor.toFixed(2)}</dd>
+                  </div>
+                  <div>
+                    <dt>Cluster</dt>
+                    <dd>{source.walletClusterSignal}/100</dd>
                   </div>
                 </dl>
                 <p className="signal">{decision.rationale[0]}</p>
@@ -782,7 +891,24 @@ function Dashboard() {
                 <dt>Stress Risk</dt>
                 <dd>{stressedRisk}/100</dd>
               </div>
+              <div>
+                <dt>Health Factor</dt>
+                <dd>{selectedSource.healthFactor.toFixed(2)}</dd>
+              </div>
+              <div>
+                <dt>Buffer</dt>
+                <dd>{selectedSource.liquidationBufferPct}%</dd>
+              </div>
             </dl>
+            <div className="runbook-panel">
+              <p className="eyebrow">Agent runbook</p>
+              {selectedSource.runbook.map((step, index) => (
+                <article key={step}>
+                  <span>{index + 1}</span>
+                  <p>{step}</p>
+                </article>
+              ))}
+            </div>
             <ul>
               {selectedDecision.rationale.slice(0, 4).map((item) => (
                 <li key={item}>{item}</li>
@@ -1021,6 +1147,21 @@ function Presentation() {
                 <ClipboardList size={20} />
                 <strong>On-chain audit trail</strong>
                 <p>Decision payloads are ready for Mantle registry recording.</p>
+              </article>
+              <article>
+                <Gauge size={20} />
+                <strong>Health-factor monitoring</strong>
+                <p>Routes expose liquidation buffer, stress downside, and runbook readiness.</p>
+              </article>
+              <article>
+                <Network size={20} />
+                <strong>Wallet-cluster signals</strong>
+                <p>The agent weighs smart-wallet movement and social consensus before trusting alpha.</p>
+              </article>
+              <article>
+                <Bot size={20} />
+                <strong>Agent runbooks</strong>
+                <p>Every recommendation shows the pre-execution checklist judges can inspect.</p>
               </article>
             </div>
           </section>

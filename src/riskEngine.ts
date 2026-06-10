@@ -18,6 +18,8 @@ function buildRationale(item: MantleOpportunity, riskScore: number, confidence: 
     item.lastSignal,
     `Risk score ${riskScore}/100 reflects volatility at ${item.volatilityBps} bps and concentration at ${item.concentrationRisk}/100.`,
     `Confidence ${confidence}% is based on liquidity depth, momentum, and yield stability.`,
+    `Health factor ${item.healthFactor.toFixed(2)} and ${item.liquidationBufferPct}% liquidation buffer define the execution guard.`,
+    `Wallet-cluster signal ${item.walletClusterSignal}/100 and social consensus ${item.socialConsensus}/100 add a crowd-risk check.`,
     ...item.evidence,
   ];
 
@@ -36,9 +38,20 @@ export function scoreOpportunity(item: MantleOpportunity): AgentDecision {
   const liquidityScore = clamp(100 - item.liquidityUsd / 45_000, 0, 35);
   const volatilityScore = clamp(item.volatilityBps / 25, 0, 35);
   const concentrationScore = clamp(item.concentrationRisk * 0.3, 0, 30);
-  const riskScore = Math.round(liquidityScore + volatilityScore + concentrationScore);
+  const healthPenalty = clamp((2.2 - item.healthFactor) * 12, 0, 16);
+  const clusterPenalty = clamp((50 - item.walletClusterSignal) * 0.14, 0, 8);
+  const riskScore = Math.round(liquidityScore + volatilityScore + concentrationScore + healthPenalty + clusterPenalty);
   const confidence = Math.round(
-    clamp(72 + item.momentumScore * 0.22 + item.yieldBps / 120 - riskScore * 0.28, 45, 94),
+    clamp(
+      72 +
+        item.momentumScore * 0.18 +
+        item.yieldBps / 130 +
+        item.socialConsensus * 0.08 +
+        item.walletClusterSignal * 0.06 -
+        riskScore * 0.28,
+      45,
+      94,
+    ),
   );
   const action = chooseAction(riskScore, item.yieldBps, item.momentumScore);
   const rationale = buildRationale(item, riskScore, confidence);
