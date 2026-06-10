@@ -6,9 +6,9 @@ Built for The Turing Test Hackathon 2026.
 
 Public repo: https://github.com/Procoder1234556/mantle-riskpilot
 
-Production demo URL: pending Vercel deployment
+Production demo URL: https://mantle-riskpilot.vercel.app
 
-Presentation page: `/#presentation`
+Presentation page: https://mantle-riskpilot.vercel.app/#presentation
 
 ## Hackathon Fit
 
