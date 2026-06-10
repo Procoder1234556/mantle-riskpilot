@@ -12,6 +12,7 @@ export type MantleOpportunity = {
   momentumScore: number;
   concentrationRisk: number;
   lastSignal: string;
+  evidence: string[];
 };
 
 export type AgentDecision = {
@@ -51,6 +52,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     momentumScore: 78,
     concentrationRisk: 22,
     lastSignal: "Yield spread widened while drawdown stayed controlled",
+    evidence: [
+      "mETH yield remains attractive relative to volatile LP positions",
+      "Liquidity is deep enough for staged allocation changes",
+      "Correlation risk is lower than concentrated DEX range exposure",
+    ],
   },
   {
     id: "moe-range-watch",
@@ -64,6 +70,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     momentumScore: 61,
     concentrationRisk: 38,
     lastSignal: "Fee velocity slowed while bin depth stayed healthy",
+    evidence: [
+      "Bin depth is sufficient but short-window fee velocity cooled",
+      "Volatility suggests no immediate autonomous rebalance",
+      "Operator review protects against range-chasing behavior",
+    ],
   },
   {
     id: "usdy-defensive-sleeve",
@@ -77,6 +88,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     momentumScore: 69,
     concentrationRisk: 17,
     lastSignal: "Stable yield profile improves portfolio drawdown protection",
+    evidence: [
+      "RWA sleeve reduces portfolio variance",
+      "Lower volatility supports defensive allocation",
+      "Yield is lower than LP routes but risk-adjusted score is strong",
+    ],
   },
   {
     id: "stable-route-sentinel",
@@ -90,6 +106,11 @@ export const mantleOpportunities: MantleOpportunity[] = [
     momentumScore: 52,
     concentrationRisk: 25,
     lastSignal: "Low volatility route can absorb defensive stable allocations",
+    evidence: [
+      "Stable route volatility is lowest in the current opportunity set",
+      "Yield is modest, so the agent avoids over-allocating",
+      "Useful as a safe harbor during higher DEX volatility",
+    ],
   },
 ];
 

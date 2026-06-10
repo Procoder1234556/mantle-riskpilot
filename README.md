@@ -4,6 +4,12 @@ Mantle RiskPilot is a full-stack AI agent dashboard for Mantle DeFi strategy mon
 
 Built for The Turing Test Hackathon 2026.
 
+Public repo: https://github.com/Procoder1234556/mantle-riskpilot
+
+Production demo URL: pending Vercel deployment
+
+Presentation page: `/#presentation`
+
 ## Hackathon Fit
 
 - Track: AI Trading & Strategy / AI DevTools
@@ -11,6 +17,7 @@ Built for The Turing Test Hackathon 2026.
 - AI component: strategy recommendation engine with transparent rationale
 - On-chain component: `StrategyDecisionRegistry.sol` records agent decisions, confidence, and risk score
 - Product component: responsive dashboard for operators to review and trigger strategies
+- Safety component: medium/high-risk actions are proposed for review instead of being auto-signed
 
 ## What It Does
 
@@ -19,6 +26,11 @@ Built for The Turing Test Hackathon 2026.
 - Shows an auditable activity timeline for every agent decision
 - Includes a Solidity contract scaffold for storing AI strategy decisions on-chain
 - Models the agent flow as market intake, reasoning, execution guard, and on-chain registry
+- Produces rationale artifacts that can be pinned and referenced by an on-chain evidence hash
+
+## Why It Can Win
+
+RiskPilot focuses on a real missing layer in agentic DeFi: accountability before execution. Judges can see the AI reasoning, the risk gate, the Mantle-specific protocol model, and the exact contract interface that makes decisions auditable.
 
 ## Local Development
 
@@ -40,9 +52,20 @@ frontend dashboard -> recommendation engine -> decision payload
 decision payload -> StrategyDecisionRegistry.sol -> Mantle transaction log
 ```
 
+## Key Files
+
+- `src/agentWorkflow.ts` - builds the agent run, stages, and audit summary
+- `src/riskEngine.ts` - scores Mantle opportunities and emits typed decisions
+- `src/mantleProtocols.ts` - maps Mantle protocol roles and risk surfaces
+- `contracts/StrategyDecisionRegistry.sol` - on-chain decision registry
+- `PITCH.md` - judge-facing pitch
+- `SUBMISSION.md` - DoraHacks submission draft
+
 ## Deployment Notes
 
 The current repository includes the frontend, recommendation model stub, and smart contract scaffold. The next production step is deploying `contracts/StrategyDecisionRegistry.sol` to Mantle Sepolia or Mantle Mainnet and wiring the returned contract address into the dashboard.
+
+The frontend is configured for Vercel. Build output is generated with `npm run build` and served from `dist`.
 
 ## Open-Source Base Research
 

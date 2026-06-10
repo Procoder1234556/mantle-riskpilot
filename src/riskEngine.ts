@@ -18,6 +18,7 @@ function buildRationale(item: MantleOpportunity, riskScore: number, confidence: 
     item.lastSignal,
     `Risk score ${riskScore}/100 reflects volatility at ${item.volatilityBps} bps and concentration at ${item.concentrationRisk}/100.`,
     `Confidence ${confidence}% is based on liquidity depth, momentum, and yield stability.`,
+    ...item.evidence,
   ];
 
   if (item.liquidityUsd < 750_000) {

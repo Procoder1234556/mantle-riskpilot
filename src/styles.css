@@ -80,6 +80,12 @@ nav a:hover {
   color: #ffffff;
 }
 
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100vh;
+}
+
 .workspace {
   padding: 32px;
 }
@@ -111,6 +117,17 @@ button {
   cursor: pointer;
 }
 
+.icon-button {
+  display: inline-grid;
+  min-width: 44px;
+  min-height: 44px;
+  place-items: center;
+  border-radius: 8px;
+  color: #0c2726;
+  background: #7ee2c8;
+  text-decoration: none;
+}
+
 .eyebrow {
   margin: 0;
   text-transform: uppercase;
@@ -128,7 +145,8 @@ button {
 
 .metrics article,
 .strategy-card,
-.registry {
+.registry,
+.protocol-grid article {
   border: 1px solid #d5e2dd;
   border-radius: 8px;
   background: #ffffff;
@@ -290,14 +308,256 @@ ol {
   padding-left: 20px;
 }
 
+.artifact {
+  margin-top: 16px;
+}
+
+pre {
+  max-height: 270px;
+  overflow: auto;
+  padding: 14px;
+  border-radius: 8px;
+  color: #dff8ef;
+  background: #102826;
+  font-size: 12px;
+  line-height: 1.55;
+}
+
+.protocols {
+  margin-top: 30px;
+}
+
+.protocol-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.protocol-grid article {
+  display: grid;
+  gap: 12px;
+  padding: 18px;
+}
+
+.protocol-grid dl {
+  display: grid;
+  gap: 12px;
+}
+
+.protocol-grid dd {
+  font-weight: 600;
+  line-height: 1.35;
+}
+
+.presentation-page {
+  background: #f7faf8;
+}
+
+.presentation-hero {
+  display: grid;
+  gap: 18px;
+  padding: 46px 0 32px;
+  border-bottom: 1px solid #d5e2dd;
+}
+
+.presentation-hero h1 {
+  margin: 0;
+  max-width: 920px;
+  font-size: clamp(42px, 7vw, 86px);
+  line-height: 0.95;
+}
+
+.presentation-hero p {
+  max-width: 760px;
+  margin: 0;
+  color: #465d58;
+  font-size: 20px;
+  line-height: 1.5;
+}
+
+.hero-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.hero-actions a {
+  display: inline-flex;
+  min-height: 42px;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: #0c2726;
+  background: #7ee2c8;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.hero-actions a + a {
+  border: 1px solid #c9dad5;
+  background: #ffffff;
+}
+
+.notion-layout {
+  display: grid;
+  grid-template-columns: 220px minmax(0, 920px);
+  gap: 34px;
+  align-items: start;
+  padding-top: 32px;
+}
+
+.toc {
+  position: sticky;
+  top: 24px;
+  display: grid;
+  gap: 10px;
+  padding: 16px;
+  border: 1px solid #d5e2dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.toc a {
+  color: #5f7671;
+  font-size: 14px;
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.notion-doc {
+  display: grid;
+  gap: 26px;
+}
+
+.notion-doc section {
+  padding-bottom: 26px;
+  border-bottom: 1px solid #d5e2dd;
+}
+
+.notion-doc h2 {
+  margin: 0 0 12px;
+  font-size: 30px;
+}
+
+.notion-doc p {
+  color: #3f5551;
+  font-size: 17px;
+  line-height: 1.65;
+}
+
+.callout,
+.doc-grid div,
+.feature-list article,
+.timeline article {
+  border: 1px solid #d5e2dd;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.callout {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 18px;
+}
+
+.callout p {
+  margin: 0;
+}
+
+.doc-grid,
+.feature-list,
+.timeline {
+  display: grid;
+  gap: 12px;
+}
+
+.doc-grid {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 14px;
+}
+
+.doc-grid div,
+.feature-list article,
+.timeline article {
+  padding: 16px;
+}
+
+.doc-grid span,
+.feature-list p,
+.timeline p {
+  display: block;
+  margin: 6px 0 0;
+  color: #5f7671;
+  line-height: 1.45;
+}
+
+.feature-list {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.feature-list article,
+.timeline article {
+  display: grid;
+  gap: 8px;
+}
+
+.architecture {
+  display: grid;
+  grid-template-columns:
+    minmax(120px, 1fr) 34px minmax(120px, 1fr) 34px minmax(120px, 1fr)
+    34px minmax(120px, 1fr);
+  align-items: center;
+  margin: 18px 0;
+}
+
+.architecture div {
+  display: grid;
+  min-height: 76px;
+  place-items: center;
+  padding: 12px;
+  border: 1px solid #c4d8d1;
+  border-radius: 8px;
+  background: #ffffff;
+  font-weight: 800;
+  text-align: center;
+}
+
+.architecture span {
+  height: 2px;
+  background: #35b994;
+}
+
+.timeline {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
 @media (max-width: 900px) {
   main,
   .panel-grid,
-  .metrics {
+  .metrics,
+  .protocol-grid,
+  .notion-layout,
+  .doc-grid,
+  .feature-list,
+  .timeline,
+  .architecture {
     grid-template-columns: 1fr;
   }
 
   .sidebar {
     position: static;
+    height: auto;
+  }
+
+  .toc {
+    position: static;
+  }
+
+  .architecture span {
+    width: 2px;
+    height: 22px;
+    justify-self: center;
   }
 }
