@@ -1,12 +1,14 @@
 # Mantle RiskPilot
 
-Mantle RiskPilot is a full-stack AI agent dashboard for Mantle DeFi strategy monitoring. It turns pool, volatility, liquidity, and risk signals into explainable agent decisions, then prepares those decisions for on-chain recording through a Solidity decision registry.
+Mantle RiskPilot is a live MVP for Mantle DeFi strategy monitoring. It turns public DeFi data, simulated market ticks, volatility, liquidity, and risk signals into explainable agent decisions, then prepares those decisions for on-chain recording through a Solidity decision registry.
 
 Built for The Turing Test Hackathon 2026.
 
 Public repo: https://github.com/Procoder1234556/mantle-riskpilot
 
-Production demo URL: https://mantle-riskpilot.vercel.app
+Production landing page: https://mantle-riskpilot.vercel.app
+
+Live MVP dashboard: https://mantle-riskpilot.vercel.app/#app
 
 Presentation page: https://mantle-riskpilot.vercel.app/#presentation
 
@@ -22,6 +24,9 @@ Presentation page: https://mantle-riskpilot.vercel.app/#presentation
 ## What It Does
 
 - Scores Mantle DeFi opportunities across liquidity, volatility, risk, and momentum
+- Pulls public Mantle context from DefiLlama and falls back to a resilient local stream
+- Recalculates strategy recommendations in a live operator dashboard
+- Lets an operator approve or reject agent decisions in the review queue
 - Explains why an agent recommends hold, rebalance, reduce exposure, or monitor
 - Shows an auditable activity timeline for every agent decision
 - Includes a Solidity contract scaffold for storing AI strategy decisions on-chain
@@ -55,6 +60,7 @@ decision payload -> StrategyDecisionRegistry.sol -> Mantle transaction log
 ## Key Files
 
 - `src/agentWorkflow.ts` - builds the agent run, stages, and audit summary
+- `src/liveData.ts` - fetches public live DeFi data and maps it into the opportunity model
 - `src/riskEngine.ts` - scores Mantle opportunities and emits typed decisions
 - `src/mantleProtocols.ts` - maps Mantle protocol roles and risk surfaces
 - `contracts/StrategyDecisionRegistry.sol` - on-chain decision registry

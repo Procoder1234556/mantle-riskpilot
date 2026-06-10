@@ -22,7 +22,11 @@ https://github.com/Procoder1234556/mantle-riskpilot
 
 ## Project Website
 
+Landing page:
 https://mantle-riskpilot.vercel.app
+
+Live MVP:
+https://mantle-riskpilot.vercel.app/#app
 
 Presentation page:
 https://mantle-riskpilot.vercel.app/#presentation
